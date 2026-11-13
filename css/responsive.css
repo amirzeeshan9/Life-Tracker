@@ -1,0 +1,131 @@
+/* ==========================================================================
+   LifeOS — responsive.css
+   Tablet and mobile adaptations.
+   ========================================================================== */
+
+.only-mobile { display: none; }
+
+/* ------------------------------ <= 1180px -------------------------------- */
+@media (max-width: 1180px) {
+  .hero { flex-direction: column; align-items: flex-start; }
+  .hero-clock { width: 100%; }
+  .clock-time { font-size: 28px; }
+}
+
+/* ------------------------------ <= 1024px -------------------------------- */
+@media (max-width: 1024px) {
+  .topbar { padding: 12px 18px; }
+  .content { padding: 18px 18px 48px; }
+  .profile-name { display: none; }
+  .profile { padding: 5px; }
+
+  /* Sidebar becomes an overlay drawer */
+  .app,
+  .app.is-collapsed { grid-template-columns: minmax(0, 1fr); }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 268px;
+    transform: translateX(-104%);
+    box-shadow: var(--shadow-lg);
+  }
+  .app.is-drawer-open .sidebar { transform: none; }
+
+  /* Drawer always shows full labels */
+  .app.is-collapsed .brand-text,
+  .app.is-collapsed .nav-item span,
+  .app.is-collapsed .side-widget,
+  .app.is-collapsed .collapse-btn span { display: revert; }
+  .app.is-collapsed .nav-item { justify-content: flex-start; padding: 10px 12px; }
+  .app.is-collapsed .brand { justify-content: flex-start; }
+  .app.is-collapsed .collapse-btn { display: none; }
+
+  .only-mobile { display: inline-grid; }
+  .dash-cols { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------ <= 780px --------------------------------- */
+@media (max-width: 780px) {
+  body { font-size: 13.5px; }
+
+  .content { padding: 14px 13px 44px; }
+  .topbar { padding: 10px 13px; gap: 10px; min-height: 60px; }
+  .topbar-titles h1 { font-size: 16.5px; }
+  .topbar-titles p { font-size: 11.5px; }
+  .topbar-actions { gap: 7px; }
+  .btn-label { display: none; }
+  #quickAddBtn { padding: 0 11px; }
+
+  .hero { padding: 20px 18px; gap: 16px; border-radius: var(--radius-lg); }
+  .hero-title { font-size: 20px; }
+  .hero-actions .btn { flex: 1; }
+
+  .card { padding: 15px; border-radius: var(--radius); }
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .stat { padding: 13px 14px; }
+  .stat-value { font-size: 21px; }
+  .stat-label { font-size: 11.5px; }
+
+  .toolbar { padding: 11px; gap: 9px; }
+  .search-field { max-width: none; flex-basis: 100%; }
+  .segmented { flex: 1 1 100%; justify-content: flex-start; overflow-x: auto; }
+  .segmented button { flex: 0 0 auto; }
+  .segmented.wide button { flex: 1; }
+  .toolbar .btn { flex: 1; }
+  .toolbar .toolbar-spacer { display: none; }
+  .date-input { min-width: 0; flex: 1; }
+
+  .field-2 { grid-template-columns: 1fr; }
+  .ach-list,
+  .notes-grid { grid-template-columns: 1fr; }
+  .planner-grid { grid-template-columns: 1fr; }
+  .settings-grid { grid-template-columns: 1fr; }
+
+  .modal { max-width: none; border-radius: var(--radius-lg); }
+  .modal-body,
+  .modal-head,
+  .modal-foot { padding-left: 16px; padding-right: 16px; }
+  .modal-foot { flex-direction: column-reverse; }
+  .modal-foot .btn { width: 100%; }
+  .modal-foot.split { flex-direction: column-reverse; }
+
+  .toast-root { right: 12px; left: 12px; bottom: 12px; }
+  .toast { min-width: 0; max-width: none; }
+
+  /* Bigger tap targets for routine controls */
+  .seg-3 button { width: 46px; height: 42px; }
+  .rcell { width: 38px; height: 38px; }
+  .day-row { padding: 12px 13px; gap: 10px; flex-wrap: wrap; }
+  .day-row .seg-3 { width: 100%; justify-content: flex-end; }
+
+  /* Reveal hover-only actions on touch screens */
+  .ach-actions,
+  .note-foot-actions { opacity: 1; }
+
+  .routine-table { min-width: 560px; }
+  .routine-name { min-width: 130px; padding-left: 13px !important; }
+  .calendar-note { font-size: 11px; }
+  .cal-cell { min-height: 54px; padding: 5px 6px; border-radius: 9px; }
+}
+
+/* ------------------------------ <= 430px --------------------------------- */
+@media (max-width: 430px) {
+  .stat-grid { grid-template-columns: 1fr; }
+  .topbar-actions .icon-btn { width: 33px; height: 33px; }
+  .hero-clock { min-width: 0; }
+  .clock-time { font-size: 26px; }
+  .task-item { padding: 11px 12px; gap: 10px; }
+  .task-actions .tiny-btn { width: 26px; height: 26px; }
+  .legend { gap: 10px 14px; padding: 11px 13px; }
+}
+
+/* --------------------------- Reduced motion ------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

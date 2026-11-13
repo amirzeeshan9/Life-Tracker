@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#101116" />
+<title>LifeOS — Personal Daily Planner</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+
+<!-- Prevent theme flash: apply stored theme before first paint -->
+<script>
+  (function () {
+    try {
+      var raw = localStorage.getItem('lifeos.data.v1');
+      var theme = 'dark';
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.settings && parsed.settings.theme) theme = parsed.settings.theme;
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/components.css" />
+<link rel="stylesheet" href="css/responsive.css" />
+</head>
+
+<body>
+<div class="bg-layer" aria-hidden="true">
+  <span class="bg-blob b1"></span>
+  <span class="bg-blob b2"></span>
+  <span class="bg-blob b3"></span>
+</div>
+
+<div class="app" id="app">
+
+  <!-- ======================= SIDEBAR ======================= -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><i data-lucide="hexagon"></i></div>
+      <div class="brand-text">
+        <span class="brand-name">LifeOS</span>
+        <span class="brand-sub">Personal Planner</span>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav" aria-label="Main navigation">
+      <button class="nav-item is-active" data-page="dashboard">
+        <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-page="tasks">
+        <i data-lucide="list-checks"></i><span>To-Do List</span>
+      </button>
+      <button class="nav-item" data-page="planner">
+        <i data-lucide="calendar-days"></i><span>Daily Planner</span>
+      </button>
+      <button class="nav-item" data-page="routine">
+        <i data-lucide="repeat"></i><span>Routine Tracker</span>
+      </button>
+      <button class="nav-item" data-page="achievements">
+        <i data-lucide="trophy"></i><span>My Achievements</span>
+      </button>
+      <button class="nav-item" data-page="notes">
+        <i data-lucide="sticky-note"></i><span>Quick Notes</span>
+      </button>
+      <button class="nav-item" data-page="settings">
+        <i data-lucide="settings"></i><span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="side-widget" id="sideWidget">
+        <div class="side-widget-head">
+          <span>Today</span>
+          <span id="sidePct">0%</span>
+        </div>
+        <div class="progress"><div class="progress-bar" id="sideBar" style="width:0%"></div></div>
+        <p class="side-widget-foot" id="sideFoot">No tasks yet</p>
+      </div>
+      <button class="collapse-btn" id="collapseBtn" title="Collapse sidebar">
+        <i data-lucide="panel-left-close"></i><span>Collapse</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="sidebar-scrim" id="scrim"></div>
+
+  <!-- ======================= MAIN ======================= -->
+  <div class="main">
+
+    <header class="topbar">
+      <button class="icon-btn only-mobile" id="menuBtn" aria-label="Open menu">
+        <i data-lucide="menu"></i>
+      </button>
+
+      <div class="topbar-titles">
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSubtitle">—</p>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="menu-wrap">
+          <button class="btn btn-primary" id="quickAddBtn">
+            <i data-lucide="plus"></i><span class="btn-label">Quick Add</span>
+          </button>
+          <div class="menu" id="quickAddMenu" hidden>
+            <button data-quick="task"><i data-lucide="list-checks"></i>New Task</button>
+            <button data-quick="routine"><i data-lucide="repeat"></i>Routine Activity</button>
+            <button data-quick="achievement"><i data-lucide="trophy"></i>Achievement</button>
+            <button data-quick="note"><i data-lucide="sticky-note"></i>Note</button>
+          </div>
+        </div>
+
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+          <i data-lucide="moon" data-theme-icon></i>
+        </button>
+
+        <button class="profile" id="profileBtn" title="Open settings">
+          <span class="avatar" id="avatar">A</span>
+          <span class="profile-name" id="profileName">Amir</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="content" id="content">
+
+      <!-- ------------------ DASHBOARD ------------------ -->
+      <section class="page is-active" id="page-dashboard">
+        <div class="hero card glass">
+          <div class="hero-main">
+            <p class="hero-greet" id="dashGreeting">Good evening</p>
+            <h2 class="hero-title" id="dashHeadline">Let's make today count.</h2>
+            <p class="hero-sub" id="dashDate">—</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" data-quick="task"><i data-lucide="plus"></i>New Task</button>
+              <button class="btn btn-ghost" data-quick="achievement"><i data-lucide="sparkles"></i>Log Achievement</button>
+            </div>
+          </div>
+          <div class="hero-clock">
+            <div class="clock-time" id="dashClock">--:--</div>
+            <div class="clock-date" id="dashClockDate">—</div>
+          </div>
+        </div>
+
+        <div class="stat-grid" id="dashStats"></div>
+
+        <div class="dash-cols">
+          <div class="card glass">
+            <div class="card-head">
+              <div>
+                <h3>Today's Tasks</h3>
+                <p class="card-sub" id="dashTaskSub">—</p>
+              </div>
+              <button class="btn btn-ghost btn-sm" data-goto="tasks">Open<i data-lucide="arrow-up-right"></i></button>
+            </div>
+            <div id="dashTaskList" class="mini-list"></div>
+          </div>
+
+          <div class="card glass">
+            <div class="card-head">
+              <div>
+                <h3>Routine Progress</h3>
+                <p class="card-sub" id="dashRoutineSub">—</p>
+              </div>
+              <button class="btn btn-ghost btn-sm" data-goto="routine">Open<i data-lucide="arrow-up-right"></i></button>
+            </div>
+            <div id="dashRoutineList" class="mini-list"></div>
+          </div>
+        </div>
+
+        <div class="dash-cols">
+          <div class="card glass">
+            <div class="card-head">
+              <div>
+                <h3>Upcoming</h3>
+                <p class="card-sub">Tasks scheduled after today</p>
+              </div>
+            </div>
+            <div id="dashUpcoming" class="mini-list"></div>
+          </div>
+
+          <div class="card glass">
+            <div class="card-head">
+              <div>
+                <h3>Today's Achievements</h3>
+                <p class="card-sub" id="dashAchSub">—</p>
+              </div>
+              <button class="btn btn-ghost btn-sm" data-goto="achievements">Open<i data-lucide="arrow-up-right"></i></button>
+            </div>
+            <div id="dashAchievements" class="mini-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ------------------ TO-DO LIST ------------------ -->
+      <section class="page" id="page-tasks">
+        <div class="toolbar card glass">
+          <div class="search-field">
+            <i data-lucide="search"></i>
+            <input type="search" id="taskSearch" placeholder="Search tasks..." autocomplete="off" />
+          </div>
+          <div class="segmented" id="taskFilters">
+            <button data-filter="all" class="is-active">All</button>
+            <button data-filter="pending">Pending</button>
+            <button data-filter="completed">Completed</button>
+            <button data-filter="overdue">Overdue</button>
+          </div>
+          <div class="toolbar-spacer"></div>
+          <select class="input select" id="taskPriorityFilter" title="Filter by priority">
+            <option value="all">All priorities</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <div class="segmented view-switch" id="taskViewSwitch">
+            <button data-view="list" class="is-active" title="List view"><i data-lucide="list"></i></button>
+            <button data-view="month" title="Month view"><i data-lucide="calendar-days"></i></button>
+          </div>
+          <button class="btn btn-primary" data-quick="task"><i data-lucide="plus"></i>Add Task</button>
+        </div>
+        <div class="card glass task-summary" id="taskSummary"></div>
+        <div id="taskList"></div>
+        <div id="taskMonth" hidden></div>
+      </section>
+
+      <!-- ------------------ DAILY PLANNER ------------------ -->
+      <section class="page" id="page-planner">
+        <div class="toolbar card glass">
+          <div class="segmented" id="plannerQuick">
+            <button data-offset="0" class="is-active">Today</button>
+            <button data-offset="1">Tomorrow</button>
+          </div>
+          <div class="period-nav">
+            <button class="icon-btn" id="plannerPrev" aria-label="Previous day"><i data-lucide="chevron-left"></i></button>
+            <input type="date" class="input date-input" id="plannerDate" />
+            <button class="icon-btn" id="plannerNext" aria-label="Next day"><i data-lucide="chevron-right"></i></button>
+          </div>
+          <div class="toolbar-spacer"></div>
+          <button class="btn btn-primary" id="plannerAdd"><i data-lucide="plus"></i>Plan Task</button>
+        </div>
+        <div class="planner-grid">
+          <div class="card glass" id="plannerPendingCard">
+            <div class="card-head">
+              <div>
+                <h3 id="plannerPendingTitle">Pending</h3>
+                <p class="card-sub" id="plannerPendingSub">—</p>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="plannerMoveUnfinished" title="Push unfinished tasks to the next day">
+                <i data-lucide="move-right"></i>Move unfinished
+              </button>
+            </div>
+            <div class="progress big"><div class="progress-bar" id="plannerBar" style="width:0%"></div></div>
+            <div id="plannerPending" class="task-items"></div>
+          </div>
+          <div class="card glass">
+            <div class="card-head">
+              <div>
+                <h3>Completed</h3>
+                <p class="card-sub" id="plannerDoneSub">—</p>
+              </div>
+            </div>
+            <div id="plannerDone" class="task-items"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ------------------ ROUTINE TRACKER ------------------ -->
+      <section class="page" id="page-routine">
+        <div class="toolbar card glass">
+          <div class="segmented" id="routineViews">
+            <button data-view="day" class="is-active">Day</button>
+            <button data-view="week">Week</button>
+            <button data-view="month">Month</button>
+          </div>
+          <div class="period-nav">
+            <button class="icon-btn" id="routinePrev" aria-label="Previous period"><i data-lucide="chevron-left"></i></button>
+            <span class="period-label" id="routinePeriod">—</span>
+            <button class="icon-btn" id="routineNext" aria-label="Next period"><i data-lucide="chevron-right"></i></button>
+            <button class="btn btn-ghost btn-sm" id="routineToday">Today</button>
+          </div>
+          <div class="toolbar-spacer"></div>
+          <button class="btn btn-ghost" id="manageRoutines"><i data-lucide="sliders-horizontal"></i>Manage</button>
+          <button class="btn btn-primary" id="addRoutineBtn"><i data-lucide="plus"></i>New Activity</button>
+        </div>
+
+        <div class="stat-grid" id="routineStats"></div>
+        <div id="routineBody"></div>
+      </section>
+
+      <!-- ------------------ ACHIEVEMENTS ------------------ -->
+      <section class="page" id="page-achievements">
+        <div class="toolbar card glass">
+          <div class="segmented" id="achFilters">
+            <button data-filter="today" class="is-active">Today</button>
+            <button data-filter="week">This Week</button>
+            <button data-filter="all">All</button>
+          </div>
+          <div class="search-field">
+            <i data-lucide="search"></i>
+            <input type="search" id="achSearch" placeholder="Search achievements..." autocomplete="off" />
+          </div>
+          <div class="toolbar-spacer"></div>
+          <button class="btn btn-primary" data-quick="achievement"><i data-lucide="plus"></i>Add Achievement</button>
+        </div>
+        <div id="achievementList"></div>
+      </section>
+
+      <!-- ------------------ NOTES ------------------ -->
+      <section class="page" id="page-notes">
+        <div class="toolbar card glass">
+          <div class="search-field">
+            <i data-lucide="search"></i>
+            <input type="search" id="noteSearch" placeholder="Search notes..." autocomplete="off" />
+          </div>
+          <div class="toolbar-spacer"></div>
+          <button class="btn btn-primary" data-quick="note"><i data-lucide="plus"></i>New Note</button>
+        </div>
+        <div class="notes-grid" id="notesGrid"></div>
+      </section>
+
+      <!-- ------------------ SETTINGS ------------------ -->
+      <section class="page" id="page-settings">
+        <div class="settings-grid">
+
+          <div class="card glass">
+            <div class="card-head"><div><h3>Profile</h3><p class="card-sub">How should LifeOS address you?</p></div></div>
+            <div class="field">
+              <label for="setName">Display name</label>
+              <input type="text" class="input" id="setName" placeholder="Your name" maxlength="40" />
+            </div>
+            <div class="field-row">
+              <button class="btn btn-primary" id="saveNameBtn"><i data-lucide="check"></i>Save name</button>
+            </div>
+          </div>
+
+          <div class="card glass">
+            <div class="card-head"><div><h3>Appearance</h3><p class="card-sub">Applies across every page and dialog</p></div></div>
+            <div class="segmented wide" id="themeChoice">
+              <button data-theme-value="dark"><i data-lucide="moon"></i>Dark</button>
+              <button data-theme-value="light"><i data-lucide="sun"></i>Light</button>
+            </div>
+            <p class="hint">Dark mode is the default. Your choice is remembered on this browser.</p>
+          </div>
+
+          <div class="card glass">
+            <div class="card-head"><div><h3>Notifications</h3><p class="card-sub">Reminders appear via your browser</p></div></div>
+            <div class="setting-row">
+              <div><strong>Task reminders</strong><span class="hint">Alert me about tasks due today</span></div>
+              <label class="switch"><input type="checkbox" id="notifTasks" /><span></span></label>
+            </div>
+            <div class="setting-row">
+              <div><strong>Routine reminders</strong><span class="hint">Daily nudge to mark your routines</span></div>
+              <label class="switch"><input type="checkbox" id="notifRoutine" /><span></span></label>
+            </div>
+            <div class="setting-row">
+              <div><strong>Achievement confirmations</strong><span class="hint">Show a positive toast when you log one</span></div>
+              <label class="switch"><input type="checkbox" id="notifAch" /><span></span></label>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="testNotif"><i data-lucide="bell"></i>Send test notification</button>
+          </div>
+
+          <div class="card glass">
+            <div class="card-head"><div><h3>Data</h3><p class="card-sub" id="dataSummary">—</p></div></div>
+            <div class="btn-row">
+              <button class="btn btn-ghost" id="exportBtn"><i data-lucide="download"></i>Export JSON</button>
+              <button class="btn btn-ghost" id="importBtn"><i data-lucide="upload"></i>Import JSON</button>
+              <input type="file" id="importFile" accept="application/json,.json" hidden />
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-ghost" id="loadDemoBtn"><i data-lucide="sparkles"></i>Reload demo data</button>
+              <button class="btn btn-danger" id="resetBtn"><i data-lucide="trash-2"></i>Reset all data</button>
+            </div>
+            <p class="hint">Everything is stored in this browser on this device using LocalStorage. There is no cloud sync.</p>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastRoot" class="toast-root" aria-live="polite"></div>
+
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script src="js/storage.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/tasks.js"></script>
+<script src="js/planner.js"></script>
+<script src="js/routine.js"></script>
+<script src="js/achievements.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
